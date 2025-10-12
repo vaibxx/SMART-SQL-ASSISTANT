@@ -33,18 +33,6 @@ Prerequisites
     Google Gemini API key
     MySQL or PostgreSQL database (optional)
 
-Installation
-
-    Clone the repository
-git clone https://github.com/yourusername/sql-assistant-gemini.git
-cd sql-assistant-gemini
-
-    Install dependencies
-pip install -r requirements.txt
-
-    Run the application
-streamlit run sql_assistant.py
-
 Configuration
 
     Get Google Gemini API Key:
