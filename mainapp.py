@@ -12,6 +12,7 @@ import re
 from typing import Dict, List, Optional, Tuple
 import datetime
 import io
+import os
 
 class DatabaseManager:
     
@@ -256,7 +257,6 @@ class GeminiSQLAssistant:
     def parse_llm_response(self, response: str, user_input: str) -> Dict:
         response = response.strip()
         
-        # Extract SQL query using multiple patterns
         sql_patterns = [
             r'SQL:\s*```sql\s*(.*?)\s*```',
             r'SQL:\s*(.*?)(?=\n\n|\n[A-Z]+:|\n*$)',
@@ -310,7 +310,6 @@ class GeminiSQLAssistant:
             return {"type": "message", "content": response}
     
     def format_chat_history(self, chat_history: List) -> str:
-        """Format chat history for context"""
         if not chat_history:
             return "No previous conversation."
         
@@ -409,6 +408,25 @@ class StreamlitApp:
         
         self.initialize_session_state()
         
+        # Initialize Gemini from secrets
+        self.initialize_gemini_from_secrets()
+        
+    def initialize_gemini_from_secrets(self):
+        try:
+            # Check if Gemini API key exists in secrets
+            if 'GEMINI_API_KEY' in st.secrets:
+                api_key = st.secrets['GEMINI_API_KEY']
+                if api_key and api_key.strip():
+                    self.gemini_assistant = GeminiSQLAssistant(api_key)
+                    st.session_state.gemini_configured = True
+                else:
+                    st.session_state.gemini_configured = False
+            else:
+                st.session_state.gemini_configured = False
+        except Exception as e:
+            st.error(f"Error initializing Gemini from secrets: {str(e)}")
+            st.session_state.gemini_configured = False
+    
     def initialize_session_state(self):
         defaults = {
             'chat_history': [],
@@ -418,7 +436,8 @@ class StreamlitApp:
             'connection_status': "disconnected",
             'last_query_data': None,
             'last_viz_type': None,
-            'last_viz_desc': None
+            'last_viz_desc': None,
+            'gemini_configured': False
         }
         
         for key, default in defaults.items():
@@ -428,6 +447,20 @@ class StreamlitApp:
     def setup_sidebar(self):
         with st.sidebar:
             st.title("🔧 Configuration")
+            
+            # Gemini Status
+            gemini_status = "🟢 Configured" if st.session_state.gemini_configured else "🔴 Not Configured"
+            st.subheader(f"{gemini_status}")
+            
+            if not st.session_state.gemini_configured:
+                st.error("""
+                **Gemini API Key not found!**
+                
+                Please add your Gemini API key to Streamlit secrets:
+                1. Create `.streamlit/secrets.toml` file
+                2. Add: `GEMINI_API_KEY = "your_actual_key_here"`
+                3. Redeploy the app
+                """)
             
             status_color = "🟢" if self.db_manager.is_connected else "🔴"
             st.subheader(f"{status_color} Connection Status: {st.session_state.connection_status}")
@@ -440,9 +473,9 @@ class StreamlitApp:
                 port = st.text_input("Port", "3306" if db_type == "MySQL" else "5432")
             with col2:
                 username = st.text_input("Username", "root")
-                password = st.text_input("Password", type="password", value="password")
+                password = st.text_input("Password", type="password", value="")
             
-            database = st.text_input("Database Name", "Your database name")
+            database = st.text_input("Database Name", "classicmodels")
             
             col1, col2 = st.columns(2)
             with col1:
@@ -483,7 +516,7 @@ class StreamlitApp:
                         st.error("❌ Failed to load schema from JSON")
             
             with st.expander("Sample Schema (for testing)"):
-                if st.button("Load Schema"):
+                if st.button("Load Sample Schema"):
                     sample_schema = {
                         "customers": {
                             "columns": [
@@ -523,17 +556,7 @@ class StreamlitApp:
                     st.session_state.schema_info = sample_schema
                     st.success("✅ Sample schema loaded!")
             
-            st.divider()
-            st.subheader("Gemini Configuration")
-            api_key = st.text_input("Google Gemini API Key", type="password", 
-                                   help="Get your API key from https://makersuite.google.com/app/apikey",
-                                   placeholder="Enter your Gemini API key")
-            if api_key:
-                try:
-                    self.gemini_assistant = GeminiSQLAssistant(api_key)
-                    st.success("✅ Gemini configured!")
-                except Exception as e:
-                    st.error(f"❌ Gemini configuration failed: {str(e)}")
+            # Removed the Gemini API key input section since it's now in secrets
             
             if st.session_state.schema_info:
                 st.divider()
@@ -544,7 +567,7 @@ class StreamlitApp:
                 
                 table_list = list(st.session_state.schema_info.keys())
                 st.write(f"**Tables ({len(table_list)}):**")
-                for table in table_list[:10]:  # Show first 10 tables
+                for table in table_list[:10]:
                     st.write(f"• {table}")
                 if len(table_list) > 10:
                     st.write(f"• ... and {len(table_list) - 10} more tables")
@@ -563,10 +586,10 @@ class StreamlitApp:
                             st.success("Transaction rolled back!")
     
     def handle_chat_message(self, user_input: str):
-        if not self.gemini_assistant:
+        if not st.session_state.gemini_configured:
             st.session_state.chat_history.append({
                 "role": "assistant", 
-                "content": "❌ **Please configure Gemini API key first in the sidebar**"
+                "content": "❌ **Gemini API not configured. Please check the setup instructions.**"
             })
             return
         
@@ -672,6 +695,20 @@ class StreamlitApp:
 
     def render_chat_interface(self):
         st.title("🤖 SQL Assistant with Gemini")
+        
+        # Display Gemini status
+        if not st.session_state.gemini_configured:
+            st.error("""
+            ## 🔧 Setup Required
+            
+            **To use this SQL Assistant, you need to:**
+            
+            1. **Get a Gemini API Key** from [Google AI Studio](https://makersuite.google.com/app/apikey)
+            2. **Add it to Streamlit Secrets**:
+               - Local: Create `.streamlit/secrets.toml` with `GEMINI_API_KEY = "your_key"`
+               - Cloud: Add to Streamlit Cloud secrets in app settings
+            3. **Refresh the app**
+            """)
         
         # Display connection status
         if not self.db_manager.is_connected and st.session_state.schema_info:
@@ -825,7 +862,6 @@ class StreamlitApp:
 def validate_sql_query(query: str) -> bool:
     query_upper = query.upper().strip()
     
-    # Block dangerous operations
     dangerous_patterns = [
         r'DROP\s+TABLE',
         r'DROP\s+DATABASE',
