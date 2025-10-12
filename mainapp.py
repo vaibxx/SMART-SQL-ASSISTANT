@@ -515,49 +515,6 @@ class StreamlitApp:
                     else:
                         st.error("❌ Failed to load schema from JSON")
             
-            with st.expander("Sample Schema (for testing)"):
-                if st.button("Load Sample Schema"):
-                    sample_schema = {
-                        "customers": {
-                            "columns": [
-                                {"name": "customerNumber", "type": "INT", "nullable": False, "autoincrement": False},
-                                {"name": "customerName", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "contactLastName", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "contactFirstName", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "phone", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "addressLine1", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "addressLine2", "type": "VARCHAR(50)", "nullable": True},
-                                {"name": "city", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "state", "type": "VARCHAR(50)", "nullable": True},
-                                {"name": "postalCode", "type": "VARCHAR(15)", "nullable": True},
-                                {"name": "country", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "salesRepEmployeeNumber", "type": "INT", "nullable": True},
-                                {"name": "creditLimit", "type": "DECIMAL(10,2)", "nullable": True}
-                            ],
-                            "primary_keys": ["customerNumber"],
-                            "foreign_keys": []
-                        },
-                        "products": {
-                            "columns": [
-                                {"name": "productCode", "type": "VARCHAR(15)", "nullable": False},
-                                {"name": "productName", "type": "VARCHAR(70)", "nullable": False},
-                                {"name": "productLine", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "productScale", "type": "VARCHAR(10)", "nullable": False},
-                                {"name": "productVendor", "type": "VARCHAR(50)", "nullable": False},
-                                {"name": "productDescription", "type": "TEXT", "nullable": False},
-                                {"name": "quantityInStock", "type": "SMALLINT", "nullable": False},
-                                {"name": "buyPrice", "type": "DECIMAL(10,2)", "nullable": False},
-                                {"name": "MSRP", "type": "DECIMAL(10,2)", "nullable": False}
-                            ],
-                            "primary_keys": ["productCode"],
-                            "foreign_keys": []
-                        }
-                    }
-                    st.session_state.schema_info = sample_schema
-                    st.success("✅ Sample schema loaded!")
-            
-            # Removed the Gemini API key input section since it's now in secrets
-            
             if st.session_state.schema_info:
                 st.divider()
                 st.subheader("Database Schema")
@@ -921,3 +878,4 @@ if __name__ == "__main__":
     
     app = StreamlitApp()
     app.run()
+
