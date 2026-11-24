@@ -1,4 +1,7 @@
 # SMART-SQL-ASSISTANT
+
+[Try the interactive SQL evaluation](https://vaibxx.github.io/Vaibhav-Portfolio/#work) · [Run Grain Check locally](grain-check/README.md)
+
 A Streamlit application that enables natural language interactions with your databases using Google's Gemini AI. Transform plain English into SQL queries, visualize data, and manage your database through an intuitive chat interface.
 
 ✨ Features
