@@ -1,5 +1,9 @@
 # SMART-SQL-ASSISTANT
 
+[![SQL assistant UI test](https://github.com/vaibxx/SMART-SQL-ASSISTANT/actions/workflows/sales-ui.yml/badge.svg)](https://github.com/vaibxx/SMART-SQL-ASSISTANT/actions/workflows/sales-ui.yml)
+
+The automated UI test connects to PostgreSQL through the Streamlit sidebar, submits a sales question in chat, and checks the displayed answer. It uses a fixed Gemini response so contributors can run the test without a paid API key.
+
 [Try the interactive SQL evaluation](https://vaibxx.github.io/Vaibhav-Portfolio/#work) · [Run Grain Check locally](grain-check/README.md)
 
 A Streamlit application that enables natural language interactions with your databases using Google's Gemini AI. Transform plain English into SQL queries, visualize data, and manage your database through an intuitive chat interface.
