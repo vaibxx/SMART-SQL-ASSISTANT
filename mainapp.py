@@ -457,21 +457,26 @@ class StreamlitApp:
             gemini_status = "🟢 Configured" if st.session_state.gemini_configured else "🔴 Not Configured"
             st.subheader(f"{gemini_status}")
             
-            pasted = st.text_input(
+            # Callbacks run before the next script run, so Gemini picks up the change immediately.
+            def use_pasted_key():
+                st.session_state.user_api_key = (st.session_state.get('gemini_key_input') or '').strip()
+
+            def forget_key():
+                st.session_state.user_api_key = ''
+                st.session_state.gemini_key_input = ''
+
+            st.text_input(
                 "Gemini API key",
                 type="password",
+                key="gemini_key_input",
+                on_change=use_pasted_key,
                 placeholder="Paste your own key",
                 help="Kept only in this browser session. Never saved to disk, logs or the database. "
                      "Get a free key at https://aistudio.google.com/apikey",
             )
-            if pasted and pasted.strip() != st.session_state.get('user_api_key'):
-                st.session_state.user_api_key = pasted.strip()
-                st.rerun()
             if st.session_state.get('user_api_key'):
                 st.caption("Using your key for this session only · model gemini-3.5-flash-lite")
-                if st.button("Forget my key"):
-                    st.session_state.user_api_key = ''
-                    st.rerun()
+                st.button("Forget my key", on_click=forget_key)
             elif not st.session_state.gemini_configured:
                 st.info("Paste your Gemini API key above to start asking questions.")
 
