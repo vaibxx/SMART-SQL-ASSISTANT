@@ -408,23 +408,28 @@ class StreamlitApp:
         
         self.initialize_session_state()
         
-        # Initialize Gemini from secrets
-        self.initialize_gemini_from_secrets()
-        
-    def initialize_gemini_from_secrets(self):
+        # Initialize Gemini: a key pasted in the sidebar wins, else an optional local secret
+        self.initialize_gemini()
+
+    @staticmethod
+    def secret_api_key() -> str:
+        """Key from .streamlit/secrets.toml, for running your own copy. Missing file is fine."""
         try:
-            # Check if Gemini API key exists in secrets
-            if 'GEMINI_API_KEY' in st.secrets:
-                api_key = st.secrets['GEMINI_API_KEY']
-                if api_key and api_key.strip():
-                    self.gemini_assistant = GeminiSQLAssistant(api_key)
-                    st.session_state.gemini_configured = True
-                else:
-                    st.session_state.gemini_configured = False
-            else:
-                st.session_state.gemini_configured = False
+            return str(st.secrets.get('GEMINI_API_KEY', '') or '').strip()
+        except Exception:
+            return ''
+
+    def initialize_gemini(self):
+        # The pasted key lives only in this browser session's state: never written to disk or logged.
+        api_key = (st.session_state.get('user_api_key') or '').strip() or self.secret_api_key()
+        if not api_key:
+            st.session_state.gemini_configured = False
+            return
+        try:
+            self.gemini_assistant = GeminiSQLAssistant(api_key)
+            st.session_state.gemini_configured = True
         except Exception as e:
-            st.error(f"Error initializing Gemini from secrets: {str(e)}")
+            st.error(f"Could not set up Gemini with that key: {e}")
             st.session_state.gemini_configured = False
     
     def initialize_session_state(self):
@@ -452,16 +457,24 @@ class StreamlitApp:
             gemini_status = "🟢 Configured" if st.session_state.gemini_configured else "🔴 Not Configured"
             st.subheader(f"{gemini_status}")
             
-            if not st.session_state.gemini_configured:
-                st.error("""
-                **Gemini API Key not found!**
-                
-                Please add your Gemini API key to Streamlit secrets:
-                1. Create `.streamlit/secrets.toml` file
-                2. Add: `GEMINI_API_KEY = "your_actual_key_here"`
-                3. Redeploy the app
-                """)
-            
+            pasted = st.text_input(
+                "Gemini API key",
+                type="password",
+                placeholder="Paste your own key",
+                help="Kept only in this browser session. Never saved to disk, logs or the database. "
+                     "Get a free key at https://aistudio.google.com/apikey",
+            )
+            if pasted and pasted.strip() != st.session_state.get('user_api_key'):
+                st.session_state.user_api_key = pasted.strip()
+                st.rerun()
+            if st.session_state.get('user_api_key'):
+                st.caption("Using your key for this session only · model gemini-3.5-flash-lite")
+                if st.button("Forget my key"):
+                    st.session_state.user_api_key = ''
+                    st.rerun()
+            elif not st.session_state.gemini_configured:
+                st.info("Paste your Gemini API key above to start asking questions.")
+
             status_color = "🟢" if self.db_manager.is_connected else "🔴"
             st.subheader(f"{status_color} Connection Status: {st.session_state.connection_status}")
             
@@ -660,11 +673,9 @@ class StreamlitApp:
             
             **To use this SQL Assistant, you need to:**
             
-            1. **Get a Gemini API Key** from [Google AI Studio](https://makersuite.google.com/app/apikey)
-            2. **Add it to Streamlit Secrets**:
-               - Local: Create `.streamlit/secrets.toml` with `GEMINI_API_KEY = "your_key"`
-               - Cloud: Add to Streamlit Cloud secrets in app settings
-            3. **Refresh the app**
+            1. **Get a free Gemini API key** from [Google AI Studio](https://aistudio.google.com/apikey)
+            2. **Paste it in the sidebar.** It stays in this session only and is never saved.
+            3. **Connect your MySQL or PostgreSQL database** in the sidebar, or upload a JSON schema.
             """)
         
         # Display connection status

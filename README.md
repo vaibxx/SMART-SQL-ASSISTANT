@@ -8,6 +8,34 @@ The automated UI test connects to PostgreSQL through the Streamlit sidebar, subm
 
 Paste your own Gemini API key, ask questions in plain English, and get SQL, tables and charts. A real PostgreSQL engine ([PGlite](https://github.com/electric-sql/pglite)) runs inside the page with a sample store database, or upload your own CSV. Your key stays in the tab's memory, goes only to Google's Gemini API, and is never stored. Writes are dry-run in a rolled-back transaction first, so you see exactly how many rows will change before confirming. The web app lives in [`docs/`](docs/).
 
+## Two ways to use it
+
+| | 🌐 Browser app | 🔌 Full app (Python) |
+|---|---|---|
+| Where | [vaibxx.github.io/SMART-SQL-ASSISTANT](https://vaibxx.github.io/SMART-SQL-ASSISTANT/) | Your machine, `streamlit run mainapp.py` |
+| Setup | None | About 2 minutes |
+| Data | Built-in sample store, or upload a CSV | **Your own MySQL or PostgreSQL** (host, port, username, password, database) or a JSON schema |
+| Gemini key | Paste in the page, held in tab memory only | Paste in the sidebar, held in the session only |
+| Writes | Dry-run preview, then confirm | Preview, confirm, then commit or roll back |
+
+### 🔌 Connect your own MySQL or PostgreSQL
+
+Browsers can't open database connections, so connecting a real database uses the full Python app.
+
+```sh
+git clone https://github.com/vaibxx/SMART-SQL-ASSISTANT && cd SMART-SQL-ASSISTANT
+pip install -r requirements.txt
+streamlit run mainapp.py
+```
+
+Then, in the sidebar:
+
+1. Paste your Gemini API key ([get a free one](https://aistudio.google.com/apikey)). It stays in your session only and is never saved.
+2. Pick **MySQL** or **PostgreSQL** and enter **Host, Port, Username, Password and Database name**.
+3. Click **Connect to Database** and ask questions in the chat.
+
+Any database you can reach from your machine works: `localhost`, or hosted ones such as Neon, Supabase, Railway or AWS RDS. Use a read-only database user if you only want to explore.
+
 [Run Grain Check locally](grain-check/README.md)
 
 A Streamlit application that enables natural language interactions with your databases using Google's Gemini AI. Transform plain English into SQL queries, visualize data, and manage your database through an intuitive chat interface.

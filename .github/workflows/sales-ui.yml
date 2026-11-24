@@ -4,7 +4,7 @@ on:
     paths:
       - mainapp.py
       - requirements.txt
-      - tests/test_sales_ui.py
+      - tests/**
       - .github/workflows/sales-ui.yml
   workflow_dispatch:
 permissions:
@@ -31,4 +31,4 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: python -m pip install -r requirements.txt
-      - run: python -m unittest discover -s tests -p test_sales_ui.py -v
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v

@@ -66,6 +66,9 @@ input[type="password"]:focus, textarea:focus { border-color: var(--accent); }
 .btn.danger { background: var(--bad); box-shadow: 0 6px 24px -10px var(--bad); }
 .file { display: inline-flex; align-items: center; cursor: pointer; }
 #key-forget { margin-top: 10px; }
+.own-db { background: linear-gradient(160deg, rgba(47, 217, 196, 0.08), var(--panel) 60%); border-color: rgba(47, 217, 196, 0.22); }
+.own-db .note { margin: 0 0 12px; }
+.own-db .note b { color: var(--fg); font-weight: 500; }
 
 /* schema */
 .schema { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow: auto; }

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=1" />
+  <link rel="stylesheet" href="style.css?v=2" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script type="module" src="app.js?v=1"></script>
@@ -62,13 +62,27 @@
         </div>
         <div id="schema" class="schema"></div>
       </section>
+
+      <!-- Own database -->
+      <section class="card own-db">
+        <div class="card-head">
+          <h2>3 · Your own database?</h2>
+          <span class="pill">MySQL · PostgreSQL</span>
+        </div>
+        <p class="note">
+          The full Smart SQL app connects to <b>your own MySQL or PostgreSQL</b> with host, port, username, password and database name,
+          plus charts, schema upload and commit/rollback controls.
+          Browsers can't open database connections directly, so that version runs with Python on your machine. Setup takes about 2 minutes.
+        </p>
+        <a class="btn ghost small" href="https://github.com/vaibxx/SMART-SQL-ASSISTANT#-connect-your-own-mysql-or-postgresql" target="_blank" rel="noopener">How to connect your database ↗</a>
+      </section>
     </aside>
 
     <main class="main">
       <div class="thread" id="thread">
         <div class="welcome" id="welcome">
           <h2>What do you want to know?</h2>
-          <p>The sample store has customers, products, orders and order items. Try one of these, or upload your own CSV.</p>
+          <p>The sample store has customers, products, orders and order items. Try one of these, upload your own CSV, or <a href="https://github.com/vaibxx/SMART-SQL-ASSISTANT#-connect-your-own-mysql-or-postgresql" target="_blank" rel="noopener">connect your own MySQL / PostgreSQL</a>.</p>
           <div class="chips" id="chips"></div>
         </div>
       </div>
