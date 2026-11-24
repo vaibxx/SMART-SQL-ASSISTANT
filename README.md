@@ -4,7 +4,11 @@
 
 The automated UI test connects to PostgreSQL through the Streamlit sidebar, submits a sales question in chat, and checks the displayed answer. It uses a fixed Gemini response so contributors can run the test without a paid API key.
 
-[Try the interactive SQL evaluation](https://vaibxx.github.io/Vaibhav-Portfolio/#work) · [Run Grain Check locally](grain-check/README.md)
+### ▶ [Use it in your browser](https://vaibxx.github.io/SMART-SQL-ASSISTANT/)
+
+Paste your own Gemini API key, ask questions in plain English, and get SQL, tables and charts. A real PostgreSQL engine ([PGlite](https://github.com/electric-sql/pglite)) runs inside the page with a sample store database, or upload your own CSV. Your key stays in the tab's memory, goes only to Google's Gemini API, and is never stored. Writes are dry-run in a rolled-back transaction first, so you see exactly how many rows will change before confirming. The web app lives in [`docs/`](docs/).
+
+[Run Grain Check locally](grain-check/README.md)
 
 A Streamlit application that enables natural language interactions with your databases using Google's Gemini AI. Transform plain English into SQL queries, visualize data, and manage your database through an intuitive chat interface.
 

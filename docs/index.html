@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart SQL: ask your database in plain English</title>
+  <meta name="description" content="Ask questions about a PostgreSQL database in plain English. Gemini writes the SQL, a real Postgres engine runs it in your browser, and you get tables and charts. Bring your own Gemini key; it is never stored." />
+  <meta name="theme-color" content="#07080c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script type="module" src="app.js?v=1"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">◆</span>
+      <div>
+        <h1>Smart SQL</h1>
+        <p>Ask your database in plain English</p>
+      </div>
+    </div>
+    <div class="top-links">
+      <a href="https://github.com/vaibxx/SMART-SQL-ASSISTANT" target="_blank" rel="noopener">Source</a>
+      <a href="https://vaibxx.github.io" target="_blank" rel="noopener">Made by Vaibhav</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <!-- API key -->
+      <section class="card" id="key-card">
+        <div class="card-head">
+          <h2>1 · Your Gemini key</h2>
+          <span class="pill" id="key-status">Not set</span>
+        </div>
+        <form id="key-form" autocomplete="off">
+          <input id="key-input" type="password" placeholder="Paste your Gemini API key" autocomplete="off" spellcheck="false" />
+          <button type="submit" class="btn">Use key</button>
+        </form>
+        <button id="key-forget" class="btn ghost small" hidden>Forget key</button>
+        <p class="note">
+          Your key stays in this tab's memory only. It is sent straight to Google's Gemini API and nowhere else, never saved,
+          and gone when you close or reload the tab. Model: <code>gemini-3.5-flash-lite</code>.
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a free key ↗</a>
+        </p>
+      </section>
+
+      <!-- Database -->
+      <section class="card">
+        <div class="card-head">
+          <h2>2 · Database</h2>
+          <span class="pill ok" id="db-status">Starting…</span>
+        </div>
+        <p class="note">A real PostgreSQL engine runs inside your browser. Nothing is uploaded anywhere.</p>
+        <div class="row">
+          <label class="btn ghost small file">Upload CSV<input id="csv" type="file" accept=".csv,text/csv" hidden /></label>
+          <button id="reset-db" class="btn ghost small">Reset sample data</button>
+        </div>
+        <div id="schema" class="schema"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div class="thread" id="thread">
+        <div class="welcome" id="welcome">
+          <h2>What do you want to know?</h2>
+          <p>The sample store has customers, products, orders and order items. Try one of these, or upload your own CSV.</p>
+          <div class="chips" id="chips"></div>
+        </div>
+      </div>
+
+      <form class="composer" id="composer">
+        <div class="mode" role="tablist">
+          <button type="button" class="on" data-mode="ask" role="tab">Ask in English</button>
+          <button type="button" data-mode="sql" role="tab">Write SQL</button>
+        </div>
+        <div class="input-row">
+          <textarea id="q" rows="1" placeholder="e.g. Which 5 products earned the most revenue in 2026?"></textarea>
+          <button type="submit" class="btn send" id="send">Run ↵</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <template id="tpl-turn">
+    <article class="turn">
+      <div class="q"></div>
+      <div class="a">
+        <div class="status"><span class="spin"></span><span class="status-text">Thinking…</span></div>
+      </div>
+    </article>
+  </template>
+</body>
+</html>
