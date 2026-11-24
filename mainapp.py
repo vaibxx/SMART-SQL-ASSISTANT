@@ -209,7 +209,7 @@ class GeminiSQLAssistant:
     
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        self.model = genai.GenerativeModel('gemini-3.5-flash-lite')
         
     def generate_sql_response(self, user_input: str, schema_info: str, chat_history: List) -> Dict:
         
